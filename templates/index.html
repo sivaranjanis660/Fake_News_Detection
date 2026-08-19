@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fake News Detection</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #222;
+        }
+
+        .header {
+            background: #1f2937;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .header p {
+            margin: 8px 0 0;
+            color: #d1d5db;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .container h2 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 250px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            resize: vertical;
+            font-size: 16px;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #555;
+        }
+
+        .buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .check-btn {
+            background: #2563eb;
+            color: white;
+        }
+
+        .clear-btn {
+            background: #e5e7eb;
+            color: #222;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            background: #f3f4f6;
+        }
+
+        .result h3 {
+            margin: 0 0 10px;
+            font-size: 25px;
+        }
+
+        .confidence {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        .info {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 10px;
+        }
+
+        .info h3 {
+            margin-top: 0;
+        }
+
+        .info ul {
+            line-height: 1.8;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Fake News Detection System</h1>
+        <p>Using Natural Language Processing and Machine Learning</p>
+    </div>
+
+    <div class="container">
+
+        <h2>Check Your News</h2>
+
+        <p class="description">
+            Paste a news article below and our machine learning model
+            will classify it as Real or Fake.
+        </p>
+
+        <form action="/predict" method="POST">
+
+            <textarea
+                name="news"
+                placeholder="Paste the complete news article here..."
+                required>{{ request.form.get('news', '') }}</textarea>
+
+            <div class="buttons">
+
+                <button type="submit" class="check-btn">
+                    Check News
+                </button>
+
+                <button type="button" class="clear-btn"
+                        onclick="clearText()">
+                    Clear
+                </button>
+
+            </div>
+
+        </form>
+
+        {% if prediction %}
+
+        <div class="result">
+
+            <h3>
+                Result: {{ prediction }}
+            </h3>
+
+            <div class="confidence">
+                Confidence: <strong>{{ confidence }}%</strong>
+            </div>
+
+        </div>
+
+        {% endif %}
+
+        <div class="info">
+
+            <h3>How It Works</h3>
+
+            <ul>
+                <li>Enter a news article in the text box.</li>
+                <li>The text is processed using NLP.</li>
+                <li>TF-IDF converts the text into numerical features.</li>
+                <li>The Machine Learning model analyses the features.</li>
+                <li>The system predicts Real News or Fake News.</li>
+            </ul>
+
+        </div>
+
+    </div>
+
+    <footer>
+        Fake News Detection Project | NLP & Machine Learning
+    </footer>
+
+    <script>
+        function clearText() {
+            document.querySelector("textarea").value = "";
+        }
+    </script>
+
+</body>
+</html>
