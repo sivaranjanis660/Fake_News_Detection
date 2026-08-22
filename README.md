@@ -38,10 +38,16 @@ Dataset → Preprocessing → TF-IDF → Logistic Regression → Prediction → 
 - Recall: 99%
 - F1-Score: 99%
 
+## Live Demo
+
+[Click here to use the Fake News Detection Website](https://fake-news-detection-j5hv.onrender.com)
+
 ## How to Run
 
-```bash
-python app.py# Fake_News_Detection
-
-## Live Demo link
-https://fake-news-detection-j5hv.onrender.com
+1. Clone this repository.
+2. Install the required packages:
+   `pip install -r requirements.txt`
+3. Run the Flask application:
+   `python app.py`
+4. Open your browser and go to:
+   `http://127.0.0.1:5000`
