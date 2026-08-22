@@ -42,3 +42,6 @@ Dataset → Preprocessing → TF-IDF → Logistic Regression → Prediction → 
 
 ```bash
 python app.py# Fake_News_Detection
+
+## Live Demo link
+https://fake-news-detection-j5hv.onrender.com
