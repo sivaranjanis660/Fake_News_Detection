@@ -25,11 +25,15 @@ Dataset → Preprocessing → TF-IDF → Logistic Regression → Prediction → 
 
 ## Features
 
-- News article input
-- Fake/Real news prediction
-- Confidence percentage
-- Simple web interface
-- NLP-based classification
+## Features
+
+- Detects whether a news article is Real or Fake
+- Uses TF-IDF for text feature extraction
+- Uses Logistic Regression for classification
+- Provides prediction confidence score
+- Simple and user-friendly web interface
+- Fast prediction of news articles
+- Deployed online using Render
 
 ## Model Performance
 
