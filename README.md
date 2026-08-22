@@ -23,7 +23,6 @@ To build a machine learning-based system that classifies news articles as Real o
 
 Dataset → Preprocessing → TF-IDF → Logistic Regression → Prediction → Flask Web Application
 
-## Features
 
 ## Features
 
