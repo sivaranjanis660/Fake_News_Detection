@@ -46,15 +46,15 @@ def predict():
     # Get prediction probability
     probability = model.predict_proba(news_tfidf)[0]
 
-    # Fake News
-    if prediction == 0:
-        result = "FAKE NEWS"
-        confidence = round(probability[0] * 100, 2)
+    max_probability = max(probability)
+    confidence = round(max_probability * 100, 2)
 
-    # Real News
+    if max_probability < 0.65:
+       result = "UNCERTAIN - PLEASE VERIFY"
+    elif prediction == 0:
+       result = "FAKE NEWS"
     else:
-        result = "REAL NEWS"
-        confidence = round(probability[1] * 100, 2)
+       result = "REAL NEWS"
 
     # Display result
     return render_template(
