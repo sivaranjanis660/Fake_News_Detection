@@ -15,9 +15,29 @@ def home():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    news = request.form["news"]
 
-    # Convert news text into TF-IDF features
+    # Get news from user
+    news = request.form.get("news", "").strip()
+
+    # Check empty input
+    if not news:
+        return render_template(
+            "index.html",
+            prediction="Please enter some news.",
+            confidence=None
+        )
+
+    # Check very short input
+    word_count = len(news.split())
+
+    if word_count < 10:
+        return render_template(
+            "index.html",
+            prediction="Please enter a complete news article.",
+            confidence=None
+        )
+
+    # Convert news into TF-IDF features
     news_tfidf = vectorizer.transform([news])
 
     # Make prediction
@@ -26,13 +46,17 @@ def predict():
     # Get prediction probability
     probability = model.predict_proba(news_tfidf)[0]
 
+    # Fake News
     if prediction == 0:
         result = "FAKE NEWS"
         confidence = round(probability[0] * 100, 2)
+
+    # Real News
     else:
         result = "REAL NEWS"
         confidence = round(probability[1] * 100, 2)
 
+    # Display result
     return render_template(
         "index.html",
         prediction=result,
