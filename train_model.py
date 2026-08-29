@@ -117,10 +117,10 @@ print("Testing data:", len(X_test))
 
 vectorizer = TfidfVectorizer(
     stop_words="english",
-    max_features=50000,
+    max_features=100000,
     ngram_range=(1, 2),
     min_df=2,
-    max_df=0.95,
+    max_df=0.98,
     sublinear_tf=True
 )
 
