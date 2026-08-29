@@ -67,7 +67,7 @@
         }
 
         textarea:focus {
-            border-color: #555;
+            border-color: #2563eb;
         }
 
         .buttons {
@@ -89,9 +89,17 @@
             color: white;
         }
 
+        .check-btn:hover {
+            background: #1d4ed8;
+        }
+
         .clear-btn {
             background: #e5e7eb;
             color: #222;
+        }
+
+        .clear-btn:hover {
+            background: #d1d5db;
         }
 
         .result {
@@ -110,6 +118,15 @@
         .confidence {
             font-size: 18px;
             margin-top: 10px;
+        }
+
+        .warning {
+            margin-top: 30px;
+            padding: 15px;
+            background: #fff7ed;
+            border-radius: 10px;
+            text-align: center;
+            color: #9a3412;
         }
 
         .info {
@@ -142,14 +159,16 @@
         <p>Using Natural Language Processing and Machine Learning</p>
     </div>
 
+
     <div class="container">
 
         <h2>Check Your News</h2>
 
         <p class="description">
-            Paste a news article below and our machine learning model
-            will classify it as Real or Fake.
+            Paste a complete news article below and our machine learning
+            model will classify it as Real or Fake.
         </p>
+
 
         <form action="/predict" method="POST">
 
@@ -158,20 +177,24 @@
                 placeholder="Paste the complete news article here..."
                 required>{{ request.form.get('news', '') }}</textarea>
 
+
             <div class="buttons">
 
                 <button type="submit" class="check-btn">
                     Check News
                 </button>
 
-                <button type="button" class="clear-btn"
-                        onclick="clearText()">
+                <button
+                    type="button"
+                    class="clear-btn"
+                    onclick="clearText()">
                     Clear
                 </button>
 
             </div>
 
         </form>
+
 
         {% if prediction %}
 
@@ -181,38 +204,59 @@
                 Result: {{ prediction }}
             </h3>
 
+            {% if confidence is not none %}
+
             <div class="confidence">
-                Confidence: <strong>{{ confidence }}%</strong>
+                Confidence:
+                <strong>{{ confidence }}%</strong>
             </div>
+
+            {% endif %}
 
         </div>
 
         {% endif %}
+
+
+        <div class="warning">
+
+            <strong>Note:</strong>
+
+            This system predicts based on patterns learned from
+            the training dataset. It is not a real-time fact-checking system.
+
+        </div>
+
 
         <div class="info">
 
             <h3>How It Works</h3>
 
             <ul>
-                <li>Enter a news article in the text box.</li>
+                <li>Enter a complete news article.</li>
                 <li>The text is processed using NLP.</li>
-                <li>TF-IDF converts the text into numerical features.</li>
-                <li>The Machine Learning model analyses the features.</li>
+                <li>TF-IDF converts text into numerical features.</li>
+                <li>Logistic Regression analyses the features.</li>
                 <li>The system predicts Real News or Fake News.</li>
+                <li>A confidence score is displayed with the prediction.</li>
             </ul>
 
         </div>
 
     </div>
 
+
     <footer>
         Fake News Detection Project | NLP & Machine Learning
     </footer>
 
+
     <script>
+
         function clearText() {
             document.querySelector("textarea").value = "";
         }
+
     </script>
 
 </body>
