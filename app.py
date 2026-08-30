@@ -46,34 +46,28 @@ def predict():
     # Get probability
     probability = model.predict_proba(news_tfidf)[0]
 
-    # Highest probability
+    # Get highest probability
     max_probability = max(probability)
 
-    # Confidence percentage
+    # Convert probability into percentage
     confidence = round(max_probability * 100, 2)
-
 
     # =========================================
     # RESULT LOGIC
     # =========================================
 
     if confidence < 40:
-
         result = "FAKE NEWS"
 
     elif confidence <= 50:
-
         result = "UNCERTAIN - PLEASE VERIFY"
 
     else:
-
-        # Above 50% → use model's actual prediction
-
+        # Above 50% → use model's prediction
         if prediction == 0:
             result = "FAKE NEWS"
         else:
             result = "REAL NEWS"
-
 
     # Send result to webpage
     return render_template(
