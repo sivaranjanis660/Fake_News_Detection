@@ -16,10 +16,10 @@ def home():
 @app.route("/predict", methods=["POST"])
 def predict():
 
-    # Get news text
+    # Get news text from user
     news = request.form.get("news", "").strip()
 
-    # Empty input check
+    # Check empty input
     if not news:
         return render_template(
             "index.html",
@@ -27,7 +27,7 @@ def predict():
             confidence=None
         )
 
-    # Short input check
+    # Check short input
     word_count = len(news.split())
 
     if word_count < 10:
@@ -37,13 +37,13 @@ def predict():
             confidence=None
         )
 
-    # Convert text to TF-IDF
+    # Convert news into TF-IDF features
     news_tfidf = vectorizer.transform([news])
 
-    # Prediction
+    # Make prediction
     prediction = model.predict(news_tfidf)[0]
 
-    # Probability
+    # Get probability
     probability = model.predict_proba(news_tfidf)[0]
 
     # Highest probability
@@ -52,19 +52,30 @@ def predict():
     # Confidence percentage
     confidence = round(max_probability * 100, 2)
 
-    # Result logic
-    if confidence < 45:
+
+    # =========================================
+    # RESULT LOGIC
+    # =========================================
+
+    if confidence < 40:
+
         result = "FAKE NEWS"
 
-    elif confidence <= 65:
+    elif confidence <= 50:
+
         result = "UNCERTAIN - PLEASE VERIFY"
 
     else:
+
+        # Above 50% → use model's actual prediction
+
         if prediction == 0:
             result = "FAKE NEWS"
         else:
             result = "REAL NEWS"
 
+
+    # Send result to webpage
     return render_template(
         "index.html",
         prediction=result,
