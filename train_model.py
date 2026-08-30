@@ -4,99 +4,88 @@ import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
 
-# ==========================================
-# 1. LOAD DATASETS
-# ==========================================
+# =========================================================
+# 1. LOAD DATASET
+# =========================================================
 
 fake = pd.read_csv("DATASET/Fake.csv")
 true = pd.read_csv("DATASET/True.csv")
 
-print("Datasets loaded successfully!")
+print("Dataset loaded successfully!")
 
 
-# ==========================================
+# =========================================================
 # 2. ADD LABELS
-# ==========================================
+# =========================================================
 
-# 0 = Fake News
-# 1 = Real News
-
-fake["label"] = 0
-true["label"] = 1
+fake["label"] = 0       # Fake
+true["label"] = 1       # Real
 
 
-# ==========================================
+# =========================================================
 # 3. COMBINE DATASETS
-# ==========================================
+# =========================================================
 
 data = pd.concat([fake, true], ignore_index=True)
 
+print("\nOriginal dataset shape:", data.shape)
 
-print("\nDataset shape before cleaning:", data.shape)
 
-
-# ==========================================
+# =========================================================
 # 4. CREATE CONTENT
-# ==========================================
+# =========================================================
 
-data["content"] = (
-    data["title"].fillna("").astype(str)
-    + " "
-    + data["text"].fillna("").astype(str)
-)
+data["title"] = data["title"].fillna("").astype(str)
+data["text"] = data["text"].fillna("").astype(str)
+
+data["content"] = data["title"] + " " + data["text"]
 
 
-# ==========================================
-# 5. REMOVE EMPTY CONTENT
-# ==========================================
+# =========================================================
+# 5. REMOVE EMPTY ARTICLES
+# =========================================================
 
 data = data[data["content"].str.strip() != ""]
 
 
-# ==========================================
-# 6. REMOVE DUPLICATE NEWS
-# ==========================================
+# =========================================================
+# 6. REMOVE DUPLICATES
+# =========================================================
 
 data = data.drop_duplicates(subset=["content"])
 
 
-# ==========================================
-# 7. SHUFFLE DATASET
-# ==========================================
+# =========================================================
+# 7. SHUFFLE DATA
+# =========================================================
 
-data = data.sample(
-    frac=1,
-    random_state=42
-).reset_index(drop=True)
+data = data.sample(frac=1, random_state=42).reset_index(drop=True)
 
 
-# ==========================================
+# =========================================================
 # 8. DISPLAY DATASET INFORMATION
-# ==========================================
+# =========================================================
 
-print("\nDataset shape after cleaning:", data.shape)
+print("\nDataset after cleaning:", data.shape)
 
-print("\nTotal News:", len(data))
-
-print("Fake News:", sum(data["label"] == 0))
-
-print("Real News:", sum(data["label"] == 1))
+print("\nFake news:", (data["label"] == 0).sum())
+print("Real news:", (data["label"] == 1).sum())
 
 
-# ==========================================
-# 9. SELECT INPUT AND OUTPUT
-# ==========================================
+# =========================================================
+# 9. INPUT AND OUTPUT
+# =========================================================
 
 X = data["content"]
 y = data["label"]
 
 
-# ==========================================
-# 10. TRAIN / TEST SPLIT
-# ==========================================
+# =========================================================
+# 10. TRAIN TEST SPLIT
+# =========================================================
 
 X_train, X_test, y_train, y_test = train_test_split(
     X,
@@ -106,14 +95,13 @@ X_train, X_test, y_train, y_test = train_test_split(
     stratify=y
 )
 
+print("\nTraining samples:", len(X_train))
+print("Testing samples:", len(X_test))
 
-print("\nTraining data:", len(X_train))
-print("Testing data:", len(X_test))
 
-
-# ==========================================
-# 11. TF-IDF VECTORIZER
-# ==========================================
+# =========================================================
+# 11. TF-IDF VECTORIZATION
+# =========================================================
 
 vectorizer = TfidfVectorizer(
     stop_words="english",
@@ -124,64 +112,56 @@ vectorizer = TfidfVectorizer(
     sublinear_tf=True
 )
 
-
-# Convert text into numerical values
+print("\nConverting text into TF-IDF features...")
 
 X_train_tfidf = vectorizer.fit_transform(X_train)
-
 X_test_tfidf = vectorizer.transform(X_test)
 
-
-print("\nTF-IDF conversion completed!")
-
-print("Number of features:", X_train_tfidf.shape[1])
+print("TF-IDF training shape:", X_train_tfidf.shape)
+print("TF-IDF testing shape:", X_test_tfidf.shape)
 
 
-# ==========================================
-# 12. CREATE LOGISTIC REGRESSION MODEL
-# ==========================================
+# =========================================================
+# 12. TRAIN LOGISTIC REGRESSION MODEL
+# =========================================================
 
 model = LogisticRegression(
     C=2.0,
-    max_iter=1000,
-    class_weight="balanced"
+    max_iter=2000,
+    class_weight="balanced",
+    solver="liblinear"
 )
 
-
-# ==========================================
-# 13. TRAIN MODEL
-# ==========================================
-
-print("\nTraining the model...")
+print("\nTraining model...")
 
 model.fit(X_train_tfidf, y_train)
 
 print("Model training completed!")
 
 
-# ==========================================
-# 14. PREDICT TEST DATA
-# ==========================================
+# =========================================================
+# 13. PREDICTION
+# =========================================================
 
 y_pred = model.predict(X_test_tfidf)
 
 
-# ==========================================
-# 15. CALCULATE ACCURACY
-# ==========================================
+# =========================================================
+# 14. MODEL ACCURACY
+# =========================================================
 
 accuracy = accuracy_score(y_test, y_pred)
 
-print("\n===================================")
+print("\n====================================")
 print("MODEL PERFORMANCE")
-print("===================================")
+print("====================================")
 
-print("Model Accuracy:", round(accuracy * 100, 2), "%")
+print("\nModel Accuracy:", round(accuracy * 100, 2), "%")
 
 
-# ==========================================
-# 16. CLASSIFICATION REPORT
-# ==========================================
+# =========================================================
+# 15. CLASSIFICATION REPORT
+# =========================================================
 
 print("\nClassification Report:")
 
@@ -194,28 +174,27 @@ print(
 )
 
 
-# ==========================================
-# 17. SAVE TRAINED MODEL
-# ==========================================
+# =========================================================
+# 16. CONFUSION MATRIX
+# =========================================================
 
-joblib.dump(
-    model,
-    "fake_news_model.pkl"
-)
+print("\nConfusion Matrix:")
 
-joblib.dump(
-    vectorizer,
-    "tfidf_vectorizer.pkl"
-)
+cm = confusion_matrix(y_test, y_pred)
+
+print(cm)
 
 
-# ==========================================
-# 18. FINAL MESSAGE
-# ==========================================
+# =========================================================
+# 17. SAVE MODEL
+# =========================================================
 
-print("\n===================================")
-print("MODEL SAVED SUCCESSFULLY!")
-print("===================================")
+joblib.dump(model, "fake_news_model.pkl")
 
-print("fake_news_model.pkl created")
-print("tfidf_vectorizer.pkl created")
+joblib.dump(vectorizer, "tfidf_vectorizer.pkl")
+
+print("\n====================================")
+print("Model saved successfully!")
+print("fake_news_model.pkl")
+print("tfidf_vectorizer.pkl")
+print("====================================")
