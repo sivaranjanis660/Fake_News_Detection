@@ -7,10 +7,6 @@
     <title>Fake News Detection</title>
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -21,8 +17,8 @@
         .header {
             background: #1f2937;
             color: white;
-            padding: 25px;
             text-align: center;
+            padding: 25px;
         }
 
         .header h1 {
@@ -31,7 +27,6 @@
         }
 
         .header p {
-            margin: 8px 0 0;
             color: #d1d5db;
         }
 
@@ -41,33 +36,26 @@
             padding: 30px;
             background: white;
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
         }
 
-        .container h2 {
+        h2 {
             text-align: center;
-            margin-bottom: 10px;
         }
 
         .description {
             text-align: center;
             color: #666;
-            margin-bottom: 25px;
         }
 
         textarea {
             width: 100%;
-            min-height: 250px;
+            height: 250px;
             padding: 15px;
             border: 1px solid #ccc;
             border-radius: 10px;
-            resize: vertical;
             font-size: 16px;
-            outline: none;
-        }
-
-        textarea:focus {
-            border-color: #2563eb;
+            resize: vertical;
         }
 
         .buttons {
@@ -89,17 +77,8 @@
             color: white;
         }
 
-        .check-btn:hover {
-            background: #1d4ed8;
-        }
-
         .clear-btn {
             background: #e5e7eb;
-            color: #222;
-        }
-
-        .clear-btn:hover {
-            background: #d1d5db;
         }
 
         .result {
@@ -107,26 +86,27 @@
             padding: 20px;
             text-align: center;
             border-radius: 10px;
-            background: #f3f4f6;
         }
 
-        .result h3 {
-            margin: 0 0 10px;
-            font-size: 25px;
+        .real {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .fake {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .uncertain {
+            background: #fef3c7;
+            color: #d97706;
         }
 
         .confidence {
             font-size: 18px;
             margin-top: 10px;
-        }
-
-        .warning {
-            margin-top: 30px;
-            padding: 15px;
-            background: #fff7ed;
-            border-radius: 10px;
-            text-align: center;
-            color: #9a3412;
+            color: #333;
         }
 
         .info {
@@ -136,12 +116,17 @@
             border-radius: 10px;
         }
 
-        .info h3 {
-            margin-top: 0;
+        .info li {
+            margin-bottom: 8px;
         }
 
-        .info ul {
-            line-height: 1.8;
+        .note {
+            margin-top: 20px;
+            padding: 15px;
+            text-align: center;
+            background: #f3f4f6;
+            border-radius: 10px;
+            color: #666;
         }
 
         footer {
@@ -159,16 +144,14 @@
         <p>Using Natural Language Processing and Machine Learning</p>
     </div>
 
-
     <div class="container">
 
         <h2>Check Your News</h2>
 
         <p class="description">
-            Paste a complete news article below and our machine learning
-            model will classify it as Real or Fake.
+            Paste a complete news article below and check whether it is
+            Real, Fake, or Uncertain.
         </p>
-
 
         <form action="/predict" method="POST">
 
@@ -176,7 +159,6 @@
                 name="news"
                 placeholder="Paste the complete news article here..."
                 required>{{ request.form.get('news', '') }}</textarea>
-
 
             <div class="buttons">
 
@@ -198,11 +180,24 @@
 
         {% if prediction %}
 
-        <div class="result">
+        <div class="result
 
-            <h3>
-                Result: {{ prediction }}
-            </h3>
+        {% if 'REAL NEWS' in prediction %}
+            real
+
+        {% elif 'FAKE NEWS' in prediction %}
+            fake
+
+        {% elif 'UNCERTAIN' in prediction %}
+            uncertain
+
+        {% else %}
+            uncertain
+        {% endif %}
+
+        ">
+
+            <h3>{{ prediction }}</h3>
 
             {% if confidence is not none %}
 
@@ -218,16 +213,6 @@
         {% endif %}
 
 
-        <div class="warning">
-
-            <strong>Note:</strong>
-
-            This system predicts based on patterns learned from
-            the training dataset. It is not a real-time fact-checking system.
-
-        </div>
-
-
         <div class="info">
 
             <h3>How It Works</h3>
@@ -235,12 +220,20 @@
             <ul>
                 <li>Enter a complete news article.</li>
                 <li>The text is processed using NLP.</li>
-                <li>TF-IDF converts text into numerical features.</li>
+                <li>TF-IDF converts the text into numerical features.</li>
                 <li>Logistic Regression analyses the features.</li>
-                <li>The system predicts Real News or Fake News.</li>
-                <li>A confidence score is displayed with the prediction.</li>
+                <li>The system predicts Real or Fake News.</li>
+                <li>A confidence score is displayed.</li>
+                <li>Low-confidence results are marked as Uncertain.</li>
             </ul>
 
+        </div>
+
+
+        <div class="note">
+            <strong>Note:</strong>
+            This is a machine learning prediction system.
+            Please verify important news using trusted sources.
         </div>
 
     </div>
@@ -252,11 +245,9 @@
 
 
     <script>
-
         function clearText() {
             document.querySelector("textarea").value = "";
         }
-
     </script>
 
 </body>
