@@ -10,16 +10,20 @@ vectorizer = joblib.load("tfidf_vectorizer.pkl")
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return render_template(
+        "index.html",
+        prediction=None,
+        confidence=None
+    )
 
 
 @app.route("/predict", methods=["POST"])
 def predict():
 
-    # Get news text from user
+    # Get news article from user
     news = request.form.get("news", "").strip()
 
-    # Check empty input
+    # Empty input
     if not news:
         return render_template(
             "index.html",
@@ -27,7 +31,7 @@ def predict():
             confidence=None
         )
 
-    # Check short input
+    # Check minimum words
     word_count = len(news.split())
 
     if word_count < 10:
@@ -40,30 +44,32 @@ def predict():
     # Convert news into TF-IDF features
     news_tfidf = vectorizer.transform([news])
 
-    # Make prediction
+    # Prediction
     prediction = model.predict(news_tfidf)[0]
 
-    # Get probability
+    # Probability
     probability = model.predict_proba(news_tfidf)[0]
 
-    # Get highest probability
+    # Highest probability
     max_probability = max(probability)
 
-    # Convert probability into percentage
+    # Confidence percentage
     confidence = round(max_probability * 100, 2)
 
-    # =========================================
+    # =====================================
     # RESULT LOGIC
-    # =========================================
+    # =====================================
 
     if confidence < 40:
+
         result = "FAKE NEWS"
 
     elif confidence <= 50:
+
         result = "UNCERTAIN - PLEASE VERIFY"
 
     else:
-        # Above 50% → use model's prediction
+
         if prediction == 0:
             result = "FAKE NEWS"
         else:
